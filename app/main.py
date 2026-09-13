@@ -1,0 +1,20 @@
+from fastapi import FastAPI, Depends, HTTPException, status
+import uvicorn
+from sqlalchemy import select, text
+from db import get_db
+from typing import Annotated
+from sqlalchemy.ext.asyncio import AsyncSession
+
+app = FastAPI()
+
+@app.get('/')
+async def home(db:Annotated[AsyncSession, Depends(get_db)]):
+    try:    
+        await db.execute(text("SELECT 1"))
+    except Exception as error:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database Unavailable",
+        ) from error
+    return {"message":"ecommerce backend is running"}
+
