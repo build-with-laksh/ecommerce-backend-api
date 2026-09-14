@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 import uvicorn
 from sqlalchemy import select, text
-from db import get_db
+from app.db import get_db
 from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 
