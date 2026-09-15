@@ -9,7 +9,6 @@ from alembic import context
 from app.config import settings
 from app.db import Base
 import app.models
-import selectors
 import sys
 
 if sys.platform == "win32":
