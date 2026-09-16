@@ -17,6 +17,10 @@ from app.config import settings
 
 router = APIRouter()
 
+@router.get('/me', response_model=UserPublic)
+async def get_current_user(current_user: CurrentUser):
+    return current_user
+
 @router.get("/{user_id}", response_model=UserPublic)
 async def get_user(user_id: int, db: Annotated[AsyncSession, Depends(get_db)]):
 
@@ -86,8 +90,6 @@ async def login_for_access_token(
         token_type="bearer"
     )
 
-@router.get('/me', response_model=UserPublic)
-async def get_current_user(current_user: CurrentUser):
-    return current_user
+
 
 
