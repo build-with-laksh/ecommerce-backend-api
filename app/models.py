@@ -19,6 +19,11 @@ class User(Base):
     cart_items:Mapped[list["CartItem"]] = relationship(
         back_populates="user"
     )
+    is_admin:Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        nullable=False
+    )
 
 class CartItem(Base):
     __tablename__ = "cartitems"

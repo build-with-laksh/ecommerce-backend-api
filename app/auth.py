@@ -90,6 +90,18 @@ async def get_current_user(
 
 CurrentUser = Annotated[models.User, Depends(get_current_user)]
 
+def admin_check(current_user: CurrentUser) -> models.User:
+
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You're Not Authorized to do this task"
+        )
+    
+    return current_user
+
+
+
 
 
     

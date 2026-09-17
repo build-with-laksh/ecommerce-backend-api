@@ -7,11 +7,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas import UserCreate, UserPublic, UserPrivate
 from app.auth import hash_password, verify_hash_password
 from app import models
-from app.routers import users
+from app.routers import users, products
 
 app = FastAPI()
 
 app.include_router(users.router, prefix="/users", tags=["users"])
+app.include_router(products.router, prefix="/products", tags=["products"])
 
 @app.get('/health')
 async def home(db:Annotated[AsyncSession, Depends(get_db)]):
