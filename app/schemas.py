@@ -34,3 +34,14 @@ class ProductUpdate(BaseModel):
     product_price: int | None =  Field(default=None, gt=0)
     stock_quantity: int | None = Field(default=None, ge=0)
 
+class CartItemCreate(BaseModel):
+    product_id: int
+    quantity: int = Field(gt=0)
+
+class CartItemPublic(CartItemCreate):
+    id: int
+
+class CartUpdate(BaseModel):
+    quantity: int = Field(gt=0)
+
+
