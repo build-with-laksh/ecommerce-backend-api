@@ -56,3 +56,54 @@ async def get_product(
 
     return product
 
+@router.patch('/{product_id}', response_model=ProductPublic)
+async def update_products_partial(
+   admin_user: Annotated[models.User, Depends(admin_check)],
+   db: Annotated[AsyncSession, Depends(get_db)],
+   product_id: int,
+   product_data: ProductUpdate
+):
+    result = await db.execute(select(models.Product).where(models.Product.id == product_id))
+    product = result.scalars().first()
+
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product Not Found"
+        )
+
+    if product_data.product_name is not None:
+        product.product_name = product_data.product_name
+    if product_data.product_category is not None:
+        product.product_category = product_data.product_category
+    if product_data.stock_quantity is not None:
+        product.stock_quantity = product_data.stock_quantity
+    if product_data.product_price is not None:
+        product.product_price = product_data.product_price
+
+    await db.commit()
+    await db.refresh(product)
+    return product
+
+@router.delete("/{product_id}")
+async def delete_product(
+    admin_user: Annotated[models.User, Depends(admin_check)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+    product_id: int
+):
+  
+    result = await db.execute(select(models.Product).where(models.Product.id == product_id))
+    product = result.scalars().first()
+
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product Not Found"
+        )
+
+    await db.delete(product)
+    await db.commit()
+
+    return "Your Product Has Been Deleted"
+    
+    
