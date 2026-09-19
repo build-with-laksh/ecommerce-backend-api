@@ -1,5 +1,6 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from datetime import datetime
+from app import models
 
 class UserBase(BaseModel):
     username: str
@@ -43,5 +44,22 @@ class CartItemPublic(CartItemCreate):
 
 class CartUpdate(BaseModel):
     quantity: int = Field(gt=0)
+
+class OrderItemPublic(BaseModel):
+    id: int
+    product_id: int
+    purchase_price: int
+    quantity: int
+
+class OrderPublic(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    total_bill: int
+    total_units: int
+    status: str
+    purchased_at: datetime
+    order_items: OrderItemPublic 
+
 
 

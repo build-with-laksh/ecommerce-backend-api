@@ -11,84 +11,56 @@ class User(Base):
     username:Mapped[str] = mapped_column(String, nullable=False, unique=True)
     email:Mapped[str] = mapped_column(String, nullable=False, unique=True)
     hashed_password:Mapped[str] = mapped_column(String, nullable=False)
-    is_active:Mapped[bool] = mapped_column(
-        Boolean,
-        default=True, 
-        nullable=False
-    )
-    cart_items:Mapped[list["CartItem"]] = relationship(
-        back_populates="user"
-    )
-    is_admin:Mapped[bool] = mapped_column(
-        Boolean,
-        default=False,
-        nullable=False
-    )
+    is_active:Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    cart_items:Mapped[list["CartItem"]] = relationship(back_populates="user")
+    is_admin:Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    orders: Mapped[list["Order"]] = relationship(back_populates="user")
 
 class CartItem(Base):
     __tablename__ = "cartitems"
 
-    id:Mapped[int] = mapped_column(
-        Integer, 
-        primary_key=True
-    )
-    
-    user_id:Mapped[int] = mapped_column(
-        ForeignKey("users.id")
-    )
-
-    product_id:Mapped[int] = mapped_column(
-        ForeignKey("products.id")
-    )
-
-    quantity:Mapped[int] = mapped_column(
-        Integer, 
-        default=1
-    )
-
-    added_at:Mapped[datetime] = mapped_column(
-        DateTime, 
-        default=datetime.now
-    )
-
-    user:Mapped["User"] = relationship(
-        back_populates="cart_items"
-    )
-
-    product:Mapped["Product"] = relationship(
-        back_populates="cart_items"
-    )
+    id:Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id:Mapped[int] = mapped_column(ForeignKey("users.id"))
+    product_id:Mapped[int] = mapped_column(ForeignKey("products.id"))
+    quantity:Mapped[int] = mapped_column(Integer, default=1)
+    added_at:Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    user:Mapped["User"] = relationship(back_populates="cart_items")
+    product:Mapped["Product"] = relationship(back_populates="cart_items")
 
 class Product(Base):
     __tablename__ = "products"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    product_name: Mapped[str] = mapped_column(String, nullable=False)
+    product_category: Mapped[str] = mapped_column(String, nullable=False)
+    product_price: Mapped[int] = mapped_column(Integer, nullable=False)
+    stock_quantity: Mapped[int] = mapped_column(Integer, nullable=False)
+    added_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    cart_items: Mapped[list["CartItem"]] = relationship(back_populates="product")
+    order_items: Mapped[list["OrderItem"]] = relationship(back_populates="product")
 
-    product_name: Mapped[str] = mapped_column(
-        String,
-        nullable=False
-    )
+class Order(Base):
+    __tablename__ = "orders"
 
-    product_category: Mapped[str] = mapped_column(
-        String,
-        nullable=False
-    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    total_bill: Mapped[int] = mapped_column(Integer, nullable=False)
+    total_units: Mapped[int] = mapped_column(Integer, nullable=False)
+    status: Mapped[str] = mapped_column(String, default="placed", nullable=False)
+    purchased_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    user: Mapped["User"] = relationship(back_populates="orders")
+    order_items: Mapped[list["OrderItem"]] = relationship(back_populates="order")
 
-    product_price: Mapped[int] = mapped_column(
-        Integer,
-        nullable=False
-    )
+class OrderItem(Base):
+    __tablename__ = "orderitems"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"), nullable=False)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), nullable=False)
+    purchase_price: Mapped[int] = mapped_column(Integer, nullable=False)
+    quantity: Mapped[int] = mapped_column(Integer, nullable=False)
+    order: Mapped["Order"] = relationship(back_populates="order_items")
+    product: Mapped["Product"] = relationship(back_populates="order_items")
 
-    stock_quantity: Mapped[int] = mapped_column(
-        Integer,
-        nullable=False
-    )
 
-    added_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.now
-    )
 
-    cart_items: Mapped[list["CartItem"]] = relationship(
-        back_populates="product"
-    )
+
