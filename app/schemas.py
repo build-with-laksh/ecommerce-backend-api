@@ -53,13 +53,12 @@ class OrderItemPublic(BaseModel):
 
 class OrderPublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    
+
     id: int
     total_bill: int
     total_units: int
     status: str
     purchased_at: datetime
-    order_items: OrderItemPublic 
-
+    order_items: list[OrderItemPublic]
 
 

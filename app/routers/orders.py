@@ -7,6 +7,7 @@ from app.schemas import OrderItemPublic, OrderPublic
 from app.auth import CurrentUser
 from app import models
 from datetime import timedelta, datetime, UTC
+from sqlalchemy.orm import selectinload
 
 router = APIRouter()
 
@@ -65,9 +66,48 @@ async def checkout(
         await db.delete(item)
 
     await db.commit()
-    await db.refresh(new_order)
-    return new_order
 
+    result = await db.execute(select(models.Order).options(selectinload(models.Order.order_items)).where(models.Order.id == new_order.id))
+    order = result.scalars().first()
+    return order
+
+@router.get('', response_model=list[OrderPublic])
+async def get_all_orders(
+    current_user: CurrentUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    result = await db.execute(select(models.Order).options(selectinload(models.Order.order_items)).where(models.Order.user_id == current_user.id))
+    orders = result.scalars().all()
+
+    return orders
+
+@router.get('/{order_id}', response_model=OrderPublic)
+async def get_order_by_id(
+    current_user: CurrentUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    order_id: int
+):
+    result = await db.execute(
+        select(
+            models.Order
+        ).options(
+            selectinload(
+                models.Order.order_items
+            )
+        ).where(
+            models.Order.user_id == current_user.id,
+            models.Order.id == order_id
+        )
+    )
+
+    order = result.scalars().first()
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_BAD_REQUEST,
+            detail="Oh... You haven't order anything yet or the order_id is not belongs to your id."
+        )
+
+    return order
         
         
 
