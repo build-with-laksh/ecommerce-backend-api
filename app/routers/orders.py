@@ -21,7 +21,7 @@ async def checkout(
 
     if not cart_items:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="No Products in your cart."
         )
     total_bill = 0
@@ -103,10 +103,10 @@ async def get_order_by_id(
     order = result.scalars().first()
     if not order:
         raise HTTPException(
-            status_code=status.HTTP_404_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Oh... You haven't order anything yet or the order_id is not belongs to your id."
         )
-
+    
     return order
         
         

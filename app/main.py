@@ -21,6 +21,8 @@ async def home(db:Annotated[AsyncSession, Depends(get_db)]):
     try:    
         await db.execute(text("SELECT 1"))
     except Exception as error:
+        print("ACTUAL DATABASE ERROR:", repr(error))
+
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Database Unavailable",
