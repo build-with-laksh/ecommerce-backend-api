@@ -1,0 +1,21 @@
+services:
+  postgre:
+    image : postgres
+    ports : 
+      - "5433:5432"
+    container_name : ecommerce_postgres
+    environment:
+      POSTGRES_USER : ecommerce_user
+      POSTGRES_PASSWORD : ecommerce
+      POSTGRES_DB : ecommerce_db
+
+  fastapi:
+    image : ecommerce-backend
+    ports :
+      - "8000:8000"
+    container_name : ecommerce-fastapi
+    environment:
+      SECRET_KEY : kIcVlCaKbi1mg9DeujPY_04eHlEl-CnGcom6baN775w
+      DATABASE_URL : postgresql+psycopg://ecommerce_user:ecommerce@ecommerce_postgres:5432/ecommerce_db
+
+
